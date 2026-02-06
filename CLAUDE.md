@@ -2,6 +2,38 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Fork Information (IAMSamuelRodda/sure)
+
+This is a personal fork of [we-promise/sure](https://github.com/we-promise/sure) for family finance tracking.
+
+### Local Fixes Applied
+
+1. **Uncategorized Budget Bug Fix (2026-02-06)** - `app/models/budget_category.rb`
+   - Bug: `subcategories` matched ALL categories when `category.id` was nil
+   - Fix: Added `category.id.blank?` guard clause
+
+### Deployment
+
+- **Image:** `ghcr.io/iamsamuelrodda/sure:stable`
+- **Workflow:** `.github/workflows/build-fork.yml` builds on push to main
+- **Local:** `~/docker-apps/sure/compose.yml`
+
+### Syncing Upstream
+
+```bash
+git fetch upstream
+git merge upstream/main
+# Resolve conflicts, push
+git push origin main
+```
+
+### Related Docs
+
+- Sign conventions: `~/repos/2-areas/arc-forge-hq/OPERATIONS/family-financial-report/SIGN-CONVENTIONS-AUDIT.md`
+- MCP server: `~/.claude/mcp-servers/sure-mcp/CLAUDE.md`
+
+---
+
 ## Common Development Commands
 
 ### Development Server
