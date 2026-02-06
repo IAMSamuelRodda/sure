@@ -27,6 +27,19 @@ git merge upstream/main
 git push origin main
 ```
 
+### Data Currency
+
+**Last Updated:** 2026-02-06
+
+| Account | Latest Transaction |
+|---------|-------------------|
+| On The Daily | 2026-02-05 |
+| Samuel Splurge | 2026-02-02 |
+| Kayla Splurge | 2026-01-31 |
+| Mojo | 2026-01-30 |
+| Smile Saver (ING) | 2026-01-23 |
+| Smile Saver (UBank) | 2025-12-12 |
+
 ### Related Docs
 
 - Sign conventions: `~/repos/2-areas/arc-forge-hq/OPERATIONS/family-financial-report/SIGN-CONVENTIONS-AUDIT.md`
