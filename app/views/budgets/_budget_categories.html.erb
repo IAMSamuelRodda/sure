@@ -1,10 +1,27 @@
 <%# locals: (budget:) %>
 
+<%# Pre-compute active groups: filter out categories with $0 budgeted AND $0 spent %>
+<% all_groups = budget.family.categories.expenses.any? ? BudgetCategory::Group.for(budget.budget_categories) : [] %>
+<% active_groups = all_groups.select do |group|
+  bc = group.budget_category
+  has_activity = (bc[:budgeted_spending].to_d != 0) || (bc.actual_spending.to_d != 0)
+  has_subcategory_activity = group.budget_subcategories.any? { |sc| (sc[:budgeted_spending].to_d != 0) || (sc.actual_spending.to_d != 0) }
+  has_activity || has_subcategory_activity
+end %>
+
+<%# Count only categories with actual spending (not just budgeted) %>
+<% spending_count = active_groups.count do |group|
+  bc = group.budget_category
+  has_spending = bc.actual_spending.to_d != 0
+  has_sub_spending = group.budget_subcategories.any? { |sc| sc.actual_spending.to_d != 0 }
+  has_spending || has_sub_spending
+end %>
+
 <div>
   <div class="flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-secondary uppercase">
     <p>Categories</p>
     <span class="text-subdued">&middot;</span>
-    <p><%= budget.budget_categories.count %></p>
+    <p><%= spending_count %></p>
 
     <p class="ml-auto">Amount</p>
   </div>
@@ -15,9 +32,7 @@
         <%= render "budget_categories/no_categories" %>
       </div>
     <% else %>
-      <% category_groups = BudgetCategory::Group.for(budget.budget_categories) %>
-
-      <% category_groups.each_with_index do |group, index| %>
+      <% active_groups.each_with_index do |group, index| %>
         <div class="py-2">
           <%= render "budget_categories/budget_category", budget_category: group.budget_category %>
 
