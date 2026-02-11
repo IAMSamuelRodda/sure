@@ -17,6 +17,7 @@ This is a personal fork of [we-promise/sure](https://github.com/we-promise/sure)
 - **Image:** `ghcr.io/iamsamuelrodda/sure:stable`
 - **Workflow:** `.github/workflows/build-fork.yml` builds on push to main
 - **Local:** `~/docker-apps/sure/compose.yml`
+- **Desktop launcher:** `docs/hosting/desktop.md` (Linux dock icon + launch script)
 
 ### Syncing Upstream
 
