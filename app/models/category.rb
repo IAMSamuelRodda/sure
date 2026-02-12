@@ -15,6 +15,7 @@ class Category < ApplicationRecord
   validate :nested_category_matches_parent_classification
 
   before_save :inherit_color_from_parent
+  after_save :cascade_color_to_subcategories
 
   scope :alphabetically, -> { order(:name) }
   scope :alphabetically_by_hierarchy, -> {
@@ -159,6 +160,12 @@ class Category < ApplicationRecord
   def inherit_color_from_parent
     if subcategory?
       self.color = parent.color
+    end
+  end
+
+  def cascade_color_to_subcategories
+    if saved_change_to_color? && subcategories.any?
+      subcategories.update_all(color: color)
     end
   end
 
