@@ -41,6 +41,7 @@ en:
         good: On Track
         warning: Near Limit
         over: Over Budget
+        sub_over: Sub Over
     trends:
       title: Trends & Insights
       monthly_breakdown: Monthly Breakdown

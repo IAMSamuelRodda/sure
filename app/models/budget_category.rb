@@ -88,12 +88,41 @@ class BudgetCategory < ApplicationRecord
     @parent_budget_category ||= budget.budget_categories.find { |bc| bc.category.id == category.parent_id }
   end
 
+  # For parent categories: simple total budget minus total (rolled-up) spending
+  def total_remaining
+    (self[:budgeted_spending] || 0) - actual_spending
+  end
+
+  # Shared pool size before any inheriting subcategory spending
+  def shared_pool_budget
+    return 0 unless category.parent_id.nil? && category.id.present?
+
+    parent_budget = self[:budgeted_spending] || 0
+    ring_fenced = subcategories.reject(&:inherits_parent_budget?).sum { |sc| sc[:budgeted_spending] || 0 }
+    parent_budget - ring_fenced
+  end
+
+  # Parent truly over budget when total spending exceeds total budget
+  def truly_over_budget?
+    return over_budget? if subcategory? || category.id.blank?
+
+    actual_spending > (self[:budgeted_spending] || 0)
+  end
+
+  # Parent not truly over but a subcategory is
+  def subcategory_warning?
+    return false if subcategory? || category.id.blank?
+    return false if truly_over_budget?
+
+    subcategories.any?(&:over_budget?)
+  end
+
   def available_to_spend
     if inherits_parent_budget?
-      # Subcategories using parent budget share the parent's available_to_spend
+      # Individual view: shared pool minus own spending
       parent = parent_budget_category
       return 0 unless parent
-      parent.available_to_spend
+      parent.shared_pool_budget - actual_spending
     elsif subcategory?
       # Subcategory with individual limit
       (self[:budgeted_spending] || 0) - actual_spending

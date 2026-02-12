@@ -25,7 +25,17 @@
         </div>
         <h3 class="flex-1 min-w-0 font-medium text-primary truncate"><%= budget_category.category.name %></h3>
         <div class="flex items-center gap-3 flex-shrink-0 ml-auto">
-          <% if budget_category.over_budget? %>
+          <% if budget_category.truly_over_budget? %>
+            <span class="inline-flex items-center gap-1 px-2 py-1 bg-red-500/10 text-red-500 text-xs font-medium rounded-full whitespace-nowrap">
+              <%= icon("alert-circle", size: "sm", color: "red") %>
+              <%= t("reports.budget_performance.status.over") %>
+            </span>
+          <% elsif budget_category.subcategory_warning? %>
+            <span class="inline-flex items-center gap-1 px-2 py-1 bg-yellow-500/10 text-warning text-xs font-medium rounded-full whitespace-nowrap">
+              <%= icon("alert-triangle", size: "sm", color: "yellow") %>
+              <%= t("reports.budget_performance.status.sub_over") %>
+            </span>
+          <% elsif budget_category.over_budget? %>
             <span class="inline-flex items-center gap-1 px-2 py-1 bg-red-500/10 text-red-500 text-xs font-medium rounded-full whitespace-nowrap">
               <%= icon("alert-circle", size: "sm", color: "red") %>
               <%= t("reports.budget_performance.status.over") %>
@@ -47,7 +57,7 @@
       <%# Progress Bar %>
       <div class="mb-3">
         <div class="h-1.5 bg-container-inset rounded-full overflow-hidden">
-          <% bar_color = budget_category.over_budget? ? "bg-red-500" : (budget_category.near_limit? ? "bg-yellow-500" : "bg-green-500") %>
+          <% bar_color = budget_category.truly_over_budget? ? "bg-red-500" : ((budget_category.subcategory_warning? || budget_category.over_budget? || budget_category.near_limit?) ? "bg-yellow-500" : "bg-green-500") %>
           <div class="h-full <%= bar_color %> rounded-full transition-all duration-500"
                style="width: <%= budget_category.bar_width_percent %>%"></div>
         </div>
@@ -71,7 +81,19 @@
           <% end %>
         </div>
         <div class="whitespace-nowrap w-full sm:w-auto lg:ml-auto">
-          <% if budget_category.available_to_spend >= 0 %>
+          <% if budget_category.subcategory_warning? %>
+            <%# Parent with sub over: show total remaining (budget - spending) %>
+            <span class="text-sm text-secondary"><%= t("reports.budget_performance.remaining") %>:</span>
+            <span class="font-medium text-yellow-500">
+              <%= format_money(Money.new(budget_category.total_remaining, budget_category.budget.family.currency)) %>
+            </span>
+          <% elsif budget_category.truly_over_budget? && !budget_category.subcategory? %>
+            <%# Parent truly over: show over by total amount %>
+            <span class="text-sm text-secondary"><%= t("reports.budget_performance.over_by") %>:</span>
+            <span class="font-medium text-red-500">
+              <%= format_money(Money.new(budget_category.total_remaining.abs, budget_category.budget.family.currency)) %>
+            </span>
+          <% elsif budget_category.available_to_spend >= 0 %>
             <span class="text-sm text-secondary"><%= t("reports.budget_performance.remaining") %>:</span>
             <span class="font-medium <%= (budget_category.near_limit? ? "text-yellow-500" : "text-green-500") %>">
               <%= format_money(budget_category.available_to_spend_money) %>

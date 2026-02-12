@@ -191,6 +191,15 @@ class Budget < ApplicationRecord
     cat_id = budget_category.category_id
     expense = expense_totals_by_category[cat_id]&.total || 0
     refund = income_totals_by_category[cat_id]&.total || 0
+
+    # Roll up subcategory spending into parent for budget view display
+    if budget_category.category.parent_id.nil? && cat_id.present?
+      budget_category.category.subcategories.each do |sub|
+        expense += expense_totals_by_category[sub.id]&.total || 0
+        refund += income_totals_by_category[sub.id]&.total || 0
+      end
+    end
+
     [ expense - refund, 0 ].max
   end
 
