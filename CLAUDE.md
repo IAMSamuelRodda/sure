@@ -11,6 +11,13 @@ This is a personal fork of [we-promise/sure](https://github.com/we-promise/sure)
 1. **Uncategorized Budget Bug Fix (2026-02-06)** - `app/models/budget_category.rb`
    - Bug: `subcategories` matched ALL categories when `category.id` was nil
    - Fix: Added `category.id.blank?` guard clause
+2. **Auto-Hide Empty Budget Categories (2026-02-10)** - `app/views/budgets/_budget_categories.html.erb`
+   - Hides budget categories with zero allocated and zero spent
+3. **Roll Up Subcategory Spending (2026-02-12)** - `app/models/budget_category.rb`
+   - Parent categories now include subcategory spending in their totals
+   - Added "Sub Over" badge when subcategories exceed their budget
+4. **Cascade Parent Color to Subcategories (2026-02-12)** - `app/models/category.rb`
+   - Changing a parent category's color now updates all subcategories
 
 ### Deployment
 
@@ -30,7 +37,7 @@ git push origin main
 
 ### Data Currency
 
-**Last Updated:** 2026-02-06
+**Last Updated:** 2026-02-12
 
 | Account | Latest Transaction |
 |---------|-------------------|
